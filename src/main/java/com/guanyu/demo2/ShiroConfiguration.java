@@ -1,5 +1,6 @@
 package com.guanyu.demo2;
 
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -28,12 +29,20 @@ public class ShiroConfiguration {
         bean.setSecurityManager(manager);
         bean.setLoginUrl("/login");
         bean.setSuccessUrl("/index");
+        //未授权时跳转的接口
         bean.setUnauthorizedUrl("/unauthorized");
 
         //权限配置 具体权限定义查看类----DefaultFilter
         LinkedHashMap<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/index", "authc");
-        filterChainDefinitionMap.put("login", "anon");
+        filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/loginUser", "anon");
+        //指定权限访问
+        filterChainDefinitionMap.put("/edit", "perms[edit]");
+        //指定角色访问
+        filterChainDefinitionMap.put("/admin", "roles[admin]");
+        filterChainDefinitionMap.put("/druid/**", "anon");
+        filterChainDefinitionMap.put("/**", "user");
         bean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
         return bean;
@@ -59,6 +68,8 @@ public class ShiroConfiguration {
     @Bean("authRealm")
     public AuthRealm authRealm(@Qualifier("credentialMatcher") CredentialMatcher matcher){
         AuthRealm authRealm = new AuthRealm();
+        //设置缓存管理
+        authRealm.setCacheManager(new MemoryConstrainedCacheManager());
         authRealm.setCredentialsMatcher(matcher);
         return authRealm;
     }

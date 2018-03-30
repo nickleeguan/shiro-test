@@ -7,6 +7,7 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,6 +19,32 @@ public class TestController {
         return "login";
     }
 
+    @RequestMapping("admin")
+    @ResponseBody
+    public String admin(){
+        return "admin success";
+    }
+
+    @RequestMapping("logout")
+    public String logout(){
+        Subject subject = SecurityUtils.getSubject();
+        if (subject != null){
+            subject.logout();
+        }
+        return "login";
+    }
+
+    @RequestMapping("edit")
+    @ResponseBody
+    public String edit(){
+        return "edit success";
+    }
+
+    @RequestMapping("unauthorized")
+    public String unauthorized(){
+        return "unauthorized";
+    }
+
     @RequestMapping("index")
     public String index(){
         return "index";
@@ -27,6 +54,7 @@ public class TestController {
     public String loginUser(@RequestParam(value = "username") String username,
                             @RequestParam(value = "password") String password,
                             HttpSession session){
+
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         Subject subject = SecurityUtils.getSubject();
         try{
